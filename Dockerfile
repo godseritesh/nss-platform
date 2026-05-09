@@ -1,9 +1,9 @@
 # ---------- BUILD STAGE ----------
-FROM maven:3.9.6-eclipse-temurin-21 AS build
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 
 WORKDIR /app
 
-# Install Node.js 20
+# Install Node.js 20 (Debian-based)
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs
 
@@ -19,17 +19,18 @@ RUN cd frontend && npm run build
 
 # 3. Copy Java source and build JAR
 COPY src ./src
-# Ensure static dir exists and copy built assets
+# Ensure static dir exists and copy built assets into the JAR resources
 RUN mkdir -p src/main/resources/static && \
     cp -r frontend/dist/* src/main/resources/static/
     
 RUN mvn clean package -DskipTests
 
 # ---------- RUN STAGE ----------
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
+# Security: Run as non-root
 RUN addgroup -S nss && adduser -S nss -G nss
 USER nss
 
