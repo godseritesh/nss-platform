@@ -1,7 +1,9 @@
 spring:
   application:
     name: nss-platform
-  # We now use DatabaseConfig.java for datasource setup to handle Railway URLs
+  main:
+    # Prefer IPv4 for stable networking on Railway
+    web-application-type: servlet
   jpa:
     hibernate:
       ddl-auto: validate
@@ -14,11 +16,6 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
     connect-retries: 5
-
-spring:
-  main:
-    # Prefer IPv4 for stable networking on Railway
-    web-application-type: servlet
 
 server:
   port: ${APP_PORT:8080}
