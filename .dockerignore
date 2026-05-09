@@ -1,0 +1,16 @@
+target/
+node_modules/
+frontend/node_modules/
+frontend/dist/
+.git/
+.idea/
+.vscode/
+*.log
+.mvn/
+mvnw
+mvnw.cmd
+Dockerfile
+railway.toml
+.gitignore
+.dockerignore
+README.md

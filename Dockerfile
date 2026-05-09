@@ -1,5 +1,5 @@
 # ── Stage 1: Build ────────────────────────────────────────────────
-FROM eclipse-temurin:17-jdk-alpine AS build
+FROM eclipse-temurin:21-jdk-alpine AS build
 
 WORKDIR /app
 
@@ -16,11 +16,10 @@ RUN cd frontend && npm install
 
 # 3. Copy everything else and build
 COPY . .
-# Run package but skip the 'npm install' step inside Maven since we did it above
 RUN mvn -B package -DskipTests -Dfrontend-maven-plugin.installNodeAndNpm.skip=true
 
 # ── Stage 2: Runtime ──────────────────────────────────────────────
-FROM eclipse-temurin:17-jre-alpine AS runtime
+FROM eclipse-temurin:21-jre-alpine AS runtime
 
 WORKDIR /app
 
