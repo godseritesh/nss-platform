@@ -17,9 +17,9 @@
     <packaging>jar</packaging>
     <name>NSS VIIT Platform</name>
     <description>NSS VIIT Pune Event Polling and Blood Donation Awareness Platform</description>
-
     <properties>
-        <java.version>21</java.version>
+        <java.version>17</java.version>
+        <maven.compiler.release>17</maven.compiler.release>
         <jjwt.version>0.12.5</jjwt.version>
         <frontend-maven-plugin.version>1.15.0</frontend-maven-plugin.version>
         <node.version>v20.11.0</node.version>
