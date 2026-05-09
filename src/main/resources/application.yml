@@ -13,6 +13,12 @@ spring:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
+    connect-retries: 5
+
+spring:
+  main:
+    # Prefer IPv4 for stable networking on Railway
+    web-application-type: servlet
 
 server:
   port: ${APP_PORT:8080}
