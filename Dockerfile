@@ -1,41 +1,28 @@
-# ── Stage 1: Build ────────────────────────────────────────────────
-FROM eclipse-temurin:21-jdk-alpine AS build
+# ---------- BUILD STAGE ----------
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
-# Install build tools
-RUN apk add --no-cache nodejs npm maven
-
-# 1. Copy POM and go offline for Java deps
-COPY pom.xml ./
-RUN mvn -B dependency:go-offline "-Dskip.frontend=true"
-
-# 2. Copy Frontend package files and install for caching
+COPY pom.xml .
 COPY frontend/package*.json ./frontend/
-RUN cd frontend && npm install
 
-# 3. Copy everything else and build
+RUN apt-get update && apt-get install -y nodejs npm
+
+RUN mvn -B dependency:go-offline -DskipTests || true
+
+RUN cd frontend && npm install --legacy-peer-deps
+
 COPY . .
-RUN mvn -B package -DskipTests -Dfrontend-maven-plugin.installNodeAndNpm.skip=true
 
-# ── Stage 2: Runtime ──────────────────────────────────────────────
-FROM eclipse-temurin:21-jre-alpine AS runtime
+RUN mvn clean package -DskipTests
+
+# ---------- RUN STAGE ----------
+FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-RUN addgroup -S nss && adduser -S nss -G nss
-USER nss
+COPY --from=build /app/target/*.jar app.jar
 
-COPY --from=build /app/target/nss-platform-*.jar app.jar
+EXPOSE 8080
 
-ENV PORT=8080
-EXPOSE ${PORT}
-
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD wget -qO- http://localhost:${PORT}/actuator/health || exit 1
-
-ENTRYPOINT ["java", \
-  "-XX:+UseContainerSupport", \
-  "-XX:MaxRAMPercentage=75.0", \
-  "-Djava.security.egd=file:/dev/./urandom", \
-  "-jar", "app.jar"]
+ENTRYPOINT ["java","-jar","app.jar"]
