@@ -1,0 +1,18 @@
+# ── Line ending normalization ──
+# Ensures consistent LF on all platforms, avoids CRLF warnings on Windows
+
+* text=auto eol=lf
+
+# Force binary — never touch line endings
+*.png  binary
+*.svg  binary
+*.jpg  binary
+*.jpeg binary
+*.ico  binary
+*.jar  binary
+*.zip  binary
+*.pdf  binary
+*.woff binary
+*.woff2 binary
+*.ttf  binary
+*.eot  binary

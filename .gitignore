@@ -1,0 +1,112 @@
+# ============================================================
+# .gitignore — NSS VIIT Pune Platform
+# Nothing sensitive leaves this machine.
+# ============================================================
+
+# ── Secrets & Credentials ───────────────────────────────────
+.env
+.env.*
+!.env.example          # only the template is safe to commit
+*.pem
+*.key
+*.p12
+*.jks
+*.pfx
+*.keystore
+*.truststore
+application-local.yml
+application-local.yaml
+application-secrets.yml
+secrets/
+credentials/
+
+# ── Java / Maven ─────────────────────────────────────────────
+target/
+*.class
+*.jar
+!**/test-jar.jar
+*.war
+*.ear
+*.nar
+
+# Maven wrapper JAR (binary — not needed if using system mvn)
+.mvn/wrapper/maven-wrapper.jar
+
+# ── Spring Boot ───────────────────────────────────────────────
+# Do NOT commit generated Spring config overrides
+application-prod.properties
+application-staging.properties
+
+# ── Frontend — Node / Vite ───────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.cache/
+node_modules/          # safety net for root-level install
+
+# ── IDE — IntelliJ IDEA ──────────────────────────────────────
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
+
+# ── IDE — VS Code ────────────────────────────────────────────
+.vscode/
+!.vscode/extensions.json   # extensions recommendation is safe
+!.vscode/settings.json     # workspace settings are safe
+.history/
+
+# ── IDE — Eclipse ────────────────────────────────────────────
+.classpath
+.project
+.settings/
+.factorypath
+bin/
+.apt_generated/
+.apt_generated_tests/
+
+# ── IDE — NetBeans ───────────────────────────────────────────
+nbproject/
+nbbuild/
+nbdist/
+nb-configuration.xml
+
+# ── OS artifacts ─────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# ── Logs ─────────────────────────────────────────────────────
+*.log
+logs/
+log/
+spring.log
+nohup.out
+
+# ── Test & Coverage ──────────────────────────────────────────
+*.exec
+jacoco.exec
+coverage/
+.nyc_output/
+*.xml.bak
+
+# ── Docker ───────────────────────────────────────────────────
+# Don't commit local override compose files with credentials
+docker-compose.override.yml
+docker-compose.local.yml
+
+# ── Misc build tools ─────────────────────────────────────────
+.gradle/
+build/
+*.swp
+*.swo
+*~
+.DS_Store
