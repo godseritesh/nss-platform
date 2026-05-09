@@ -3,19 +3,21 @@ FROM eclipse-temurin:17-jdk-alpine AS build
 
 WORKDIR /app
 
-# Install Node.js for frontend build
+# Install build tools
 RUN apk add --no-cache nodejs npm maven
 
-# Dependency cache layer
+# 1. Copy POM and go offline for Java deps
 COPY pom.xml ./
-RUN mvn -B dependency:go-offline "-Dskip.frontend=true" -q 2>/dev/null || true
+RUN mvn -B dependency:go-offline "-Dskip.frontend=true"
 
-# Copy source
-COPY src ./src
-COPY frontend ./frontend
+# 2. Copy Frontend package files and install for caching
+COPY frontend/package*.json ./frontend/
+RUN cd frontend && npm install
 
-# Full build — Maven compiles Java + builds React via frontend-maven-plugin
-RUN mvn -B package -DskipTests
+# 3. Copy everything else and build
+COPY . .
+# Run package but skip the 'npm install' step inside Maven since we did it above
+RUN mvn -B package -DskipTests -Dfrontend-maven-plugin.installNodeAndNpm.skip=true
 
 # ── Stage 2: Runtime ──────────────────────────────────────────────
 FROM eclipse-temurin:17-jre-alpine AS runtime
@@ -27,9 +29,7 @@ USER nss
 
 COPY --from=build /app/target/nss-platform-*.jar app.jar
 
-# Railway injects PORT automatically
 ENV PORT=8080
-
 EXPOSE ${PORT}
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
