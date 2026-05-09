@@ -36,8 +36,9 @@ USER nss
 
 COPY --from=build /app/target/nss-platform-*.jar app.jar
 
+ENV APP_PORT=8080
 ENV PORT=8080
-EXPOSE ${PORT}
+EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD wget -qO- http://localhost:${PORT}/actuator/health || exit 1
