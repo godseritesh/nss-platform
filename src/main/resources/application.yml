@@ -4,6 +4,10 @@ spring:
   main:
     # Prefer IPv4 for stable networking on Railway
     web-application-type: servlet
+  datasource:
+    url: jdbc:postgresql://localhost:5432/nssdb
+    username: postgres
+    password: postgres
   jpa:
     hibernate:
       ddl-auto: validate

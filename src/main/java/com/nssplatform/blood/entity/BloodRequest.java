@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "blood_requests", indexes = {
     @Index(name = "idx_br_status",     columnList = "status"),
-    @Index(name = "idx_br_deadline",   columnList = "deadline"),
+
     @Index(name = "idx_br_blood_group",columnList = "blood_group"),
     @Index(name = "idx_br_district",   columnList = "district")
 })
@@ -68,9 +68,6 @@ public class BloodRequest {
     @Builder.Default
     private Urgency urgency = Urgency.STANDARD;
 
-    @Column(nullable = false)
-    private LocalDate deadline;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default
@@ -92,9 +89,7 @@ public class BloodRequest {
         return urgency == Urgency.CRITICAL || urgency == Urgency.URGENT;
     }
 
-    public boolean isExpired() {
-        return deadline != null && LocalDate.now().isAfter(deadline);
-    }
+
 
     // ── Enums ──────────────────────────────────────────
     public enum BloodGroup { A_POS, A_NEG, B_POS, B_NEG, O_POS, O_NEG, AB_POS, AB_NEG }

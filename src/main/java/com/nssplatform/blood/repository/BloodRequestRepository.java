@@ -12,12 +12,12 @@ import java.util.List;
 @Repository
 public interface BloodRequestRepository extends JpaRepository<BloodRequest, Long> {
 
-    Page<BloodRequest> findByStatusOrderByUrgencyAscDeadlineAsc(BloodRequest.Status status, Pageable pageable);
+    Page<BloodRequest> findByStatusOrderByUrgencyAscCreatedAtDesc(BloodRequest.Status status, Pageable pageable);
 
-    Page<BloodRequest> findByStatusAndBloodGroupOrderByDeadlineAsc(
+    Page<BloodRequest> findByStatusAndBloodGroupOrderByCreatedAtDesc(
             BloodRequest.Status status, BloodRequest.BloodGroup bloodGroup, Pageable pageable);
 
-    @Query("SELECT r FROM BloodRequest r WHERE r.status = 'OPEN' ORDER BY r.urgency ASC, r.deadline ASC")
+    @Query("SELECT r FROM BloodRequest r WHERE r.status = 'OPEN' ORDER BY r.urgency ASC, r.createdAt DESC")
     List<BloodRequest> findAllOpenOrderedByUrgency();
 
     long countByStatus(BloodRequest.Status status);

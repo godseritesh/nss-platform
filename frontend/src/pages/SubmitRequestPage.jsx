@@ -14,7 +14,7 @@ const DISTRICTS = [
 const INITIAL = {
   patientName: '', bloodGroup: '', unitsNeeded: 1, hospital: '',
   city: '', district: '', contactName: '', contactPhone: '',
-  contactEmail: '', description: '', urgency: 'STANDARD', deadline: '',
+  contactEmail: '', description: '', urgency: 'STANDARD',
   latitude: '', longitude: ''
 };
 
@@ -121,16 +121,31 @@ export default function SubmitRequestPage() {
                   {DISTRICTS.map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
               </div>
+              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                <button type="button" className="btn btn-outline btn-sm" onClick={() => {
+                  if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                      (pos) => {
+                        set('latitude', pos.coords.latitude.toFixed(6));
+                        set('longitude', pos.coords.longitude.toFixed(6));
+                      },
+                      () => alert("Could not get location. Please allow location access or type manually.")
+                    );
+                  } else {
+                    alert("Geolocation is not supported by this browser.");
+                  }
+                }}>📍 Auto-Detect My Location</button>
+                <p className="text-tiny text-mute mt-1">Uses browser location. Alternatively, right-click on Google Maps → "What's here?"</p>
+              </div>
               <div className="form-group">
-                <label className="label">Latitude <span className="text-mute">(for map pin)</span></label>
+                <label className="label">Latitude</label>
                 <input name="latitude" type="number" step="any" className="input" value={form.latitude} onChange={onChange} placeholder="e.g. 18.5204" />
               </div>
               <div className="form-group">
-                <label className="label">Longitude <span className="text-mute">(for map pin)</span></label>
+                <label className="label">Longitude</label>
                 <input name="longitude" type="number" step="any" className="input" value={form.longitude} onChange={onChange} placeholder="e.g. 73.8567" />
               </div>
             </div>
-            <p className="text-tiny text-mute">Tip: Right-click on Google Maps → "What's here?" to get lat/lng.</p>
           </div>
 
           {/* Contact */}
@@ -149,10 +164,7 @@ export default function SubmitRequestPage() {
                 <label className="label">Email <span className="text-mute">(optional)</span></label>
                 <input name="contactEmail" type="email" className="input" value={form.contactEmail} onChange={onChange} placeholder="For donor communication" />
               </div>
-              <div className="form-group">
-                <label className="label">Deadline *</label>
-                <input name="deadline" type="date" className="input" value={form.deadline} onChange={onChange} required min={new Date().toISOString().split('T')[0]} />
-              </div>
+
             </div>
           </div>
 

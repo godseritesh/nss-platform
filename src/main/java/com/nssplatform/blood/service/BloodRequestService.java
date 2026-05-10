@@ -31,13 +31,13 @@ public class BloodRequestService {
 
     @Transactional(readOnly = true)
     public Page<BloodRequestResponse> listOpen(Pageable pageable) {
-        return requestRepo.findByStatusOrderByUrgencyAscDeadlineAsc(BloodRequest.Status.OPEN, pageable)
+        return requestRepo.findByStatusOrderByUrgencyAscCreatedAtDesc(BloodRequest.Status.OPEN, pageable)
             .map(r -> BloodRequestResponse.from(r, interestRepo.countByBloodRequestId(r.getId())));
     }
 
     @Transactional(readOnly = true)
     public Page<BloodRequestResponse> listByBloodGroup(BloodRequest.BloodGroup bg, Pageable pageable) {
-        return requestRepo.findByStatusAndBloodGroupOrderByDeadlineAsc(BloodRequest.Status.OPEN, bg, pageable)
+        return requestRepo.findByStatusAndBloodGroupOrderByCreatedAtDesc(BloodRequest.Status.OPEN, bg, pageable)
             .map(r -> BloodRequestResponse.from(r, interestRepo.countByBloodRequestId(r.getId())));
     }
 
@@ -71,7 +71,7 @@ public class BloodRequestService {
             .contactEmail(form.getContactEmail())
             .description(form.getDescription())
             .urgency(form.getUrgency())
-            .deadline(form.getDeadline())
+
             .status(BloodRequest.Status.OPEN)
             .createdBy(user.orElse(null))
             .build();

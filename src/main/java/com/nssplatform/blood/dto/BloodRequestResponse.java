@@ -25,20 +25,15 @@ public class BloodRequestResponse {
     private String contactEmail;
     private String description;
     private String urgency;
-    private LocalDate deadline;
-    private long daysLeft;
+
     private String status;
     private long donorCount;
     private LocalDateTime createdAt;
 
     public static BloodRequestResponse from(BloodRequest r, long donorCount) {
-        long daysLeft = r.getDeadline() != null
-            ? ChronoUnit.DAYS.between(LocalDate.now(), r.getDeadline())
-            : 999;
         return BloodRequestResponse.builder()
             .id(r.getId())
             .patientName(r.getPatientName())
-            .bloodGroup(r.getBloodGroup().name().replace("_", "+").replace("NEG", "-").replace("POS", "+"))
             .bloodGroup(formatBloodGroup(r.getBloodGroup()))
             .unitsNeeded(r.getUnitsNeeded())
             .hospital(r.getHospital())
@@ -52,8 +47,7 @@ public class BloodRequestResponse {
             .contactEmail(r.getContactEmail())
             .description(r.getDescription())
             .urgency(r.getUrgency().name())
-            .deadline(r.getDeadline())
-            .daysLeft(Math.max(daysLeft, 0))
+
             .status(r.getStatus().name())
             .donorCount(donorCount)
             .createdAt(r.getCreatedAt())

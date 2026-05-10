@@ -83,7 +83,7 @@ export default function BloodRequestDetailPage() {
 
   const u = URGENCY_META[req.urgency] ?? URGENCY_META.STANDARD;
   const hasMap = req.latitude && req.longitude;
-  const daysClass = req.daysLeft <= 1 ? 'critical' : req.daysLeft <= 3 ? 'urgent' : 'standard';
+  const daysClass = req.urgency === 'CRITICAL' ? 'critical' : req.urgency === 'URGENT' ? 'urgent' : 'standard';
 
   return (
     <div className="page-wrap">
@@ -103,11 +103,7 @@ export default function BloodRequestDetailPage() {
                 <span className={`badge badge-${req.urgency.toLowerCase()}`}>{u.label}</span>
               </div>
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <div className={`days-left ${daysClass}`} style={{ fontSize: '2rem' }}>{req.daysLeft}</div>
-              <div className="text-mute text-tiny">days remaining</div>
-              <div className="text-mute text-tiny" style={{ marginTop: 2 }}>Deadline: {formatDate(req.deadline)}</div>
-            </div>
+
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem', marginBottom: '1rem' }}>
@@ -146,8 +142,11 @@ export default function BloodRequestDetailPage() {
         {/* Map */}
         {hasMap && (
           <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: '1.25rem' }}>
-            <div style={{ padding: '1rem 1.25rem 0.75rem', borderBottom: '1px solid var(--border)' }}>
+            <div style={{ padding: '1rem 1.25rem 0.75rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h3 style={{ fontSize: '0.9rem', fontWeight: 600 }}>📍 Hospital Location</h3>
+              <a href={`https://www.google.com/maps/dir/?api=1&destination=${req.latitude},${req.longitude}`} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline">
+                🗺 Navigate (Google Maps)
+              </a>
             </div>
             <div className="map-container" style={{ height: 300, borderRadius: 0, border: 'none' }}>
               <MapContainer center={[req.latitude, req.longitude]} zoom={14} style={{ height: '100%', width: '100%' }}>

@@ -49,8 +49,4 @@ public class BloodRequestForm {
 
     @NotNull(message = "Urgency is required")
     private BloodRequest.Urgency urgency;
-
-    @NotNull(message = "Deadline is required")
-    @Future(message = "Deadline must be in the future")
-    private LocalDate deadline;
 }

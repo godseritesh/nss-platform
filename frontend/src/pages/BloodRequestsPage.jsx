@@ -20,16 +20,16 @@ const URGENCY_ICONS = {
   STANDARD: L.divIcon({ className: '', html: `<div style="width:10px;height:10px;border-radius:50%;background:#3b82f6;border:2px solid #fff"></div>`, iconSize: [10,10], iconAnchor: [5,5] }),
 };
 
-function daysClass(d) {
-  if (d <= 1) return 'critical';
-  if (d <= 3) return 'urgent';
+function urgencyClass(urgency) {
+  if (urgency === 'CRITICAL') return 'critical';
+  if (urgency === 'URGENT') return 'urgent';
   return 'standard';
 }
 
 function RequestCard({ r }) {
   const nav = useNavigate();
   const u = URGENCY_META[r.urgency] ?? URGENCY_META.STANDARD;
-  const dc = daysClass(r.daysLeft);
+  const dc = urgencyClass(r.urgency);
   return (
     <div className="card req-card card-clickable" onClick={() => nav(`/blood-requests/${r.id}`)}>
       <div className={`urgency-bar ${r.urgency}`} />
@@ -42,10 +42,7 @@ function RequestCard({ r }) {
               <span className={`badge badge-${r.urgency.toLowerCase()}`}>{u.label}</span>
             </div>
           </div>
-          <div style={{ textAlign: 'right' }}>
-            <div className={`days-left ${dc}`} style={{ fontSize: '1.1rem' }}>{r.daysLeft}d</div>
-            <div className="text-tiny text-mute">left</div>
-          </div>
+
         </div>
         <div className="req-card-meta">
           <span>🏥 {r.hospital}</span>
@@ -56,7 +53,7 @@ function RequestCard({ r }) {
       </div>
       <div className="req-card-footer">
         <span className="donor-count">👥 {r.donorCount} donor{r.donorCount !== 1 ? 's' : ''} responded</span>
-        <span style={{ fontSize: '0.78rem', color: 'var(--text-2)' }}>Deadline: {formatDate(r.deadline)}</span>
+
       </div>
     </div>
   );
@@ -138,7 +135,7 @@ export default function BloodRequestsPage() {
                       <strong>{r.bloodGroup}</strong> — {r.patientName}<br />
                       🏥 {r.hospital}<br />
                       📍 {r.city}<br />
-                      ⚡ {URGENCY_META[r.urgency]?.label} · {r.daysLeft}d left<br />
+                      ⚡ {URGENCY_META[r.urgency]?.label}<br />
                       <a href={`/blood-requests/${r.id}`} style={{ color: '#dc2626', fontWeight: 600 }}>View details →</a>
                     </div>
                   </Popup>
