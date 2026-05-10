@@ -48,7 +48,9 @@ public class BloodRequest {
     private String state = "Maharashtra";
 
     /** Coordinates for OpenStreetMap pin */
+    @Column(columnDefinition = "numeric")
     private Double latitude;
+    @Column(columnDefinition = "numeric")
     private Double longitude;
 
     @Column(name = "contact_name", nullable = false, length = 100)
