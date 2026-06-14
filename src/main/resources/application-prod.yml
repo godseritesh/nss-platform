@@ -1,4 +1,15 @@
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: nss@viit.ac.in
+    password: placeholdersetme
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+          auth: true
   datasource:
     url: jdbc:postgresql://ep-autumn-hill-ao8yoixr-pooler.c-2.ap-southeast-1.aws.neon.tech:5432/neondb?sslmode=require
     username: neondb_owner

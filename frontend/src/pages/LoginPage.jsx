@@ -53,6 +53,9 @@ export default function LoginPage() {
               value={form.password} onChange={handleChange} required
             />
           </div>
+          <div style={{ textAlign: 'right', marginTop: '0.25rem' }}>
+            <Link to="/forgot-password" style={{ fontSize: '0.8rem', color: 'var(--text-2)' }}>Forgot password?</Link>
+          </div>
           <button type="submit" className="btn btn-primary w-full mt-2" disabled={loading}>
             {loading ? 'Signing in…' : 'Sign In'}
           </button>

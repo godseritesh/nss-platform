@@ -8,6 +8,8 @@ import EventsPage           from './pages/EventsPage';
 import EventDetailPage      from './pages/EventDetailPage';
 import LoginPage            from './pages/LoginPage';
 import RegisterPage         from './pages/RegisterPage';
+import ForgotPasswordPage   from './pages/ForgotPasswordPage';
+import ResetPasswordPage    from './pages/ResetPasswordPage';
 import AdminDashboard       from './pages/AdminDashboard';
 import ProfilePage          from './pages/ProfilePage';
 
@@ -76,9 +78,11 @@ function AppRoutes() {
         <Route path="/blood-requests"           element={<Lazy><BloodRequestsPage /></Lazy>} />
         <Route path="/blood-requests/submit"    element={<Lazy><SubmitRequestPage /></Lazy>} />
         <Route path="/blood-requests/:id"       element={<Lazy><BloodRequestDetailPage /></Lazy>} />
-        <Route path="/login"    element={<GuestRoute><LoginPage /></GuestRoute>} />
-        <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
-        <Route path="/profile"  element={<ProfilePage />} />
+        <Route path="/login"           element={<GuestRoute><LoginPage /></GuestRoute>} />
+        <Route path="/register"        element={<GuestRoute><RegisterPage /></GuestRoute>} />
+        <Route path="/forgot-password" element={<GuestRoute><ForgotPasswordPage /></GuestRoute>} />
+        <Route path="/reset-password"  element={<ResetPasswordPage />} />
+        <Route path="/profile"         element={<ProfilePage />} />
         <Route path="/admin"    element={<AdminRoute><AdminDashboard /></AdminRoute>} />
         <Route path="/admin/users" element={<AdminRoute><Lazy><AdminUsersPage /></Lazy></AdminRoute>} />
         <Route path="*"         element={<NotFoundPage />} />
