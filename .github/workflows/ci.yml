@@ -93,3 +93,6 @@ jobs:
         with:
           name: nss-platform.jar
           path: target/nss-platform-*.jar
+
+      - name: Deploy to Render
+        run: curl -X POST "https://api.render.com/deploy/srv-d8neemojs32c73dkkdf0?key=10nmV_kwlsE"
