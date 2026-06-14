@@ -92,10 +92,15 @@ export default function BloodRequestsPage() {
         {/* Header */}
         <div className="flex-between" style={{ flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
           <div>
-            <h1 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.2rem)', fontWeight: 800, marginBottom: '0.3rem' }}>
-              🩸 Blood Requests
-            </h1>
-            <p className="text-mute text-sm">Active requests across Maharashtra, sorted by urgency.</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <h1 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.2rem)', fontWeight: 800, marginBottom: '0.3rem' }}>
+                  🩸 Blood Requests
+                </h1>
+                <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#f59e0b', border: '1px solid #f59e0b', borderRadius: '4px', padding: '0.15rem 0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Demo
+                </span>
+              </div>
+              <p className="text-mute text-sm">Active requests across Maharashtra, sorted by urgency. <strong>This data is for demo purposes only.</strong></p>
           </div>
           <button className="btn btn-primary" onClick={() => nav('/blood-requests/submit')}>
             + Submit Request
