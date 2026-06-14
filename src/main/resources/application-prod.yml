@@ -1,9 +1,9 @@
 spring:
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: nss@viit.ac.in
-    password: placeholdersetme
+    host: ${SMTP_HOST:smtp-relay.brevo.com}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USER:}
+    password: ${SMTP_PASS:}
     properties:
       mail:
         smtp:
@@ -23,6 +23,10 @@ spring:
     properties:
       hibernate:
         format_sql: false
+
+app:
+  email:
+    from: nss@viit.ac.in    # must be verified as a sender in Brevo
 
 logging:
   level:
