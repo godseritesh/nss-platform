@@ -7,10 +7,6 @@ spring:
     url: jdbc:postgresql://localhost:5432/nssdb
     username: postgres
     password: postgres
-    hikari:
-      connection-timeout: 15000
-      maximum-pool-size: 5
-      minimum-idle: 2
   jpa:
     hibernate:
       ddl-auto: validate
