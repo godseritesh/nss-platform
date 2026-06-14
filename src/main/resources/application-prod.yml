@@ -1,11 +1,12 @@
 spring:
   datasource:
-    url: ${JDBC_DATABASE_URL:jdbc:postgresql://localhost:5432/nssdb}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/nssdb}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:postgres}
     hikari:
-      connection-timeout: 10000
-      maximum-pool-size: 10
+      connection-timeout: 15000
+      maximum-pool-size: 5
+      minimum-idle: 2
   jpa:
     show-sql: false
     properties:

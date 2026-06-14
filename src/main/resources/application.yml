@@ -2,7 +2,6 @@ spring:
   application:
     name: nss-platform
   main:
-    # Prefer IPv4 for stable networking on Railway
     web-application-type: servlet
   datasource:
     url: jdbc:postgresql://localhost:5432/nssdb
