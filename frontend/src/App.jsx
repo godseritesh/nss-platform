@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Component } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar               from './components/Navbar';
 import Footer               from './components/Footer';
@@ -12,8 +13,41 @@ import BloodRequestsPage    from './pages/BloodRequestsPage';
 import BloodRequestDetailPage from './pages/BloodRequestDetailPage';
 import SubmitRequestPage    from './pages/SubmitRequestPage';
 
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="page-wrap flex-center" style={{ minHeight: '60vh', flexDirection: 'column', gap: '1rem', textAlign: 'center', padding: '2rem' }}>
+          <h1 style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>⚠️</h1>
+          <h2>Something went wrong</h2>
+          <p style={{ color: 'var(--text-2)', maxWidth: 400 }}>
+            An unexpected error occurred. Please refresh the page or try again later.
+          </p>
+          <Link to="/" className="btn btn-primary" onClick={() => this.setState({ hasError: false })}>Go Home</Link>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+function NotFoundPage() {
+  return (
+    <div className="page-wrap flex-center" style={{ minHeight: '60vh', flexDirection: 'column', gap: '1rem', textAlign: 'center', padding: '2rem' }}>
+      <h1 style={{ fontSize: '4rem', fontWeight: 800, margin: 0 }}>404</h1>
+      <p style={{ color: 'var(--text-2)' }}>The page you&#39;re looking for doesn&#39;t exist.</p>
+      <Link to="/" className="btn btn-primary">Go Home</Link>
+    </div>
+  );
+}
+
 function AdminRoute({ children }) {
-  const { user, loading, isAdmin } = useAuth();
+  const { loading, isAdmin } = useAuth();
   if (loading) return <div className="flex-center" style={{ height: '80vh' }}><div className="spinner" /></div>;
   return isAdmin ? children : <Navigate to="/login" replace />;
 }
@@ -38,7 +72,7 @@ function AppRoutes() {
         <Route path="/login"    element={<GuestRoute><LoginPage /></GuestRoute>} />
         <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
         <Route path="/admin"    element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-        <Route path="*"         element={<Navigate to="/" replace />} />
+        <Route path="*"         element={<NotFoundPage />} />
       </Routes>
       <Footer />
     </>
@@ -49,7 +83,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <ErrorBoundary>
+          <AppRoutes />
+        </ErrorBoundary>
       </AuthProvider>
     </BrowserRouter>
   );

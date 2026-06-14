@@ -12,6 +12,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,9 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
+
+    @Value("${server.servlet.session.cookie.secure:true}")
+    private boolean secureCookie;
 
     @Transactional
     public AuthResponse register(RegisterRequest request, HttpServletResponse response) {
@@ -46,10 +50,15 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request, HttpServletResponse response) {
-        User user = userRepository.findByEmail(request.getEmail().toLowerCase())
-            .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
+        String email = request.getEmail().toLowerCase();
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> {
+                log.warn("Failed login attempt for email={}: user not found", email);
+                return new UnauthorizedException("Invalid email or password");
+            });
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+            log.warn("Failed login attempt for email={}: wrong password", email);
             throw new UnauthorizedException("Invalid email or password");
         }
 
@@ -63,7 +72,7 @@ public class AuthService {
     public void logout(HttpServletResponse response) {
         Cookie cookie = new Cookie("nss_token", "");
         cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+        cookie.setSecure(secureCookie);
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
@@ -78,9 +87,9 @@ public class AuthService {
     private void setAuthCookie(HttpServletResponse response, String token) {
         Cookie cookie = new Cookie("nss_token", token);
         cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+        cookie.setSecure(secureCookie);
         cookie.setPath("/");
-        cookie.setMaxAge(86400); // 24 hours
+        cookie.setMaxAge(86400);
         cookie.setAttribute("SameSite", "Lax");
         response.addCookie(cookie);
     }

@@ -10,6 +10,7 @@ import com.nssplatform.blood.entity.DonorInterest;
 import com.nssplatform.blood.repository.BloodRequestRepository;
 import com.nssplatform.blood.repository.DonorInterestRepository;
 import com.nssplatform.shared.exception.ResourceNotFoundException;
+import com.nssplatform.shared.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -18,7 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -31,32 +33,45 @@ public class BloodRequestService {
 
     @Transactional(readOnly = true)
     public Page<BloodRequestResponse> listOpen(Pageable pageable) {
-        return requestRepo.findByStatusOrderByUrgencyAscCreatedAtDesc(BloodRequest.Status.OPEN, pageable)
-            .map(r -> BloodRequestResponse.from(r, interestRepo.countByBloodRequestId(r.getId())));
+        Page<BloodRequest> page = requestRepo.findByStatusOrderByUrgencyAscCreatedAtDesc(BloodRequest.Status.OPEN, pageable);
+        Map<Long, Long> counts = loadDonorCounts(page.getContent());
+        return page.map(r -> BloodRequestResponse.from(r, counts.getOrDefault(r.getId(), 0L)));
     }
 
     @Transactional(readOnly = true)
     public Page<BloodRequestResponse> listByBloodGroup(BloodRequest.BloodGroup bg, Pageable pageable) {
-        return requestRepo.findByStatusAndBloodGroupOrderByCreatedAtDesc(BloodRequest.Status.OPEN, bg, pageable)
-            .map(r -> BloodRequestResponse.from(r, interestRepo.countByBloodRequestId(r.getId())));
+        Page<BloodRequest> page = requestRepo.findByStatusAndBloodGroupOrderByCreatedAtDesc(BloodRequest.Status.OPEN, bg, pageable);
+        Map<Long, Long> counts = loadDonorCounts(page.getContent());
+        return page.map(r -> BloodRequestResponse.from(r, counts.getOrDefault(r.getId(), 0L)));
     }
 
     @Transactional(readOnly = true)
     public List<BloodRequestResponse> listAllOpenForMap() {
-        return requestRepo.findAllOpenOrderedByUrgency().stream()
-            .map(r -> BloodRequestResponse.from(r, interestRepo.countByBloodRequestId(r.getId())))
+        List<BloodRequest> requests = requestRepo.findAllOpenOrderedByUrgency();
+        Map<Long, Long> counts = loadDonorCounts(requests);
+        return requests.stream()
+            .map(r -> BloodRequestResponse.from(r, counts.getOrDefault(r.getId(), 0L)))
             .toList();
     }
 
     @Transactional(readOnly = true)
     public BloodRequestResponse getOne(Long id) {
         BloodRequest r = find(id);
-        return BloodRequestResponse.from(r, interestRepo.countByBloodRequestId(id));
+        long count = interestRepo.countByBloodRequestId(id);
+        return BloodRequestResponse.from(r, count);
+    }
+
+    private Map<Long, Long> loadDonorCounts(List<BloodRequest> requests) {
+        if (requests.isEmpty()) return Map.of();
+        List<Long> ids = requests.stream().map(BloodRequest::getId).toList();
+        List<Object[]> counts = interestRepo.countByBloodRequestIdIn(ids);
+        return counts.stream().collect(Collectors.toMap(c -> (Long) c[0], c -> (Long) c[1]));
     }
 
     @Transactional
     public BloodRequestResponse submit(BloodRequestForm form, String userEmail) {
-        Optional<User> user = userRepo.findByEmail(userEmail);
+        User user = userRepo.findByEmail(userEmail)
+            .orElseThrow(() -> new UnauthorizedException("User not found"));
         BloodRequest req = BloodRequest.builder()
             .patientName(form.getPatientName().trim())
             .bloodGroup(form.getBloodGroup())
@@ -73,7 +88,7 @@ public class BloodRequestService {
             .urgency(form.getUrgency())
 
             .status(BloodRequest.Status.OPEN)
-            .createdBy(user.orElse(null))
+            .createdBy(user)
             .build();
         requestRepo.save(req);
         log.info("Blood request submitted: id={} bloodGroup={} city={}", req.getId(), req.getBloodGroup(), req.getCity());

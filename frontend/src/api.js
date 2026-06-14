@@ -14,7 +14,7 @@ export const authApi = {
 };
 
 export const eventsApi = {
-  list:   (page = 0, size = 12) => api.get(`/events?page=${page}&size=${size}`),
+  list:   (page = 0, size = 12) => api.get('/events', { params: { page, size } }),
   getOne: (id)                  => api.get(`/events/${id}`),
   create: (data)                => api.post('/admin/events', data),
   update: (id, data)            => api.put(`/admin/events/${id}`, data),

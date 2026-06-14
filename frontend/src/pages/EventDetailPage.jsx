@@ -14,10 +14,11 @@ function PollWidget({ poll }) {
 
   const statusMeta = POLL_STATUS[poll.status] ?? POLL_STATUS.ACTIVE;
 
-  const loadResults = () =>
-    votesApi.results(poll.id).then(({ data }) => setResults(data));
-
-  useEffect(() => { if (hasVoted || !poll.acceptingVotes) loadResults(); }, [hasVoted]);
+  useEffect(() => {
+    if (hasVoted || !poll.acceptingVotes) {
+      votesApi.results(poll.id).then(({ data }) => setResults(data));
+    }
+  }, [hasVoted, poll.acceptingVotes, poll.id]);
 
   const handleVote = async () => {
     if (!selected || !user) return;
@@ -110,7 +111,6 @@ function PollWidget({ poll }) {
 export default function EventDetailPage() {
   const { id }    = useParams();
   const navigate  = useNavigate();
-  const { user, isAdmin } = useAuth();
 
   const [event, setEvent]   = useState(null);
   const [polls, setPolls]   = useState([]);
@@ -118,10 +118,12 @@ export default function EventDetailPage() {
   const [error, setError]     = useState(null);
 
   useEffect(() => {
+    let cancelled = false;
     Promise.all([eventsApi.getOne(id), pollsApi.byEvent(id)])
-      .then(([evRes, poRes]) => { setEvent(evRes.data); setPolls(poRes.data); })
-      .catch(() => setError('Failed to load event.'))
-      .finally(() => setLoading(false));
+      .then(([evRes, poRes]) => { if (!cancelled) { setEvent(evRes.data); setPolls(poRes.data); } })
+      .catch(() => { if (!cancelled) setError('Failed to load event.'); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [id]);
 
   if (loading) return <div className="page-wrapper flex-center"><div className="spinner" /></div>;

@@ -16,7 +16,9 @@ import com.nssplatform.votes.entity.Vote;
 import com.nssplatform.votes.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -33,7 +35,7 @@ public class VoteService {
     private final PollOptionRepository pollOptionRepository;
     private final UserRepository userRepository;
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public void castVote(Long pollId, VoteRequest req, String userEmail) {
         Poll poll = pollRepository.findById(pollId)
             .orElseThrow(() -> new ResourceNotFoundException("Poll not found: " + pollId));
@@ -52,7 +54,6 @@ public class VoteService {
         PollOption option = pollOptionRepository.findById(req.getPollOptionId())
             .orElseThrow(() -> new ResourceNotFoundException("Poll option not found"));
 
-        // Security: ensure option belongs to this poll
         if (!option.getPoll().getId().equals(pollId)) {
             throw new IllegalArgumentException("Option does not belong to this poll");
         }
@@ -62,7 +63,11 @@ public class VoteService {
             .poll(poll)
             .pollOption(option)
             .build();
-        voteRepository.save(vote);
+        try {
+            voteRepository.save(vote);
+        } catch (DataIntegrityViolationException e) {
+            throw new ConflictException("You have already voted on this poll");
+        }
         log.info("Vote cast: pollId={} userId={}", pollId, user.getId());
     }
 

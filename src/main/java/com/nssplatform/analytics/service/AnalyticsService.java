@@ -32,6 +32,10 @@ public class AnalyticsService {
         long totalVotes = voteRepository.count();
         long bloodDonationVotes = voteRepository.countBloodDonationVotes();
 
+        double increasePct = totalUsers > 0
+            ? Math.round((double) bloodDonationVotes / totalUsers * 1000.0) / 10.0
+            : 0.0;
+
         return OverviewStats.builder()
             .totalUsers(totalUsers)
             .adminCount(adminCount)
@@ -41,7 +45,7 @@ public class AnalyticsService {
             .activePolls(activePolls)
             .totalVotes(totalVotes)
             .bloodDonationVotes(bloodDonationVotes)
-            .estimatedBloodDonationIncrease(25.0)
+            .estimatedBloodDonationIncrease(increasePct)
             .build();
     }
 
@@ -51,12 +55,18 @@ public class AnalyticsService {
         long bloodVotes = voteRepository.countBloodDonationVotes();
         long totalUsers = userRepository.count();
 
+        double increasePct = totalUsers > 0
+            ? Math.round((double) bloodVotes / totalUsers * 1000.0) / 10.0
+            : 0.0;
+
         return BloodDonationStats.builder()
             .totalBloodDonationEvents(bloodEvents)
             .totalBloodDonationVotes(bloodVotes)
             .usersEngaged(totalUsers)
-            .increasePercentage(25.0)
-            .impactSummary("NSS VIIT Pune achieved a 25% increase in blood donation participation by engaging 3500+ users through targeted awareness campaigns and event polling.")
+            .increasePercentage(increasePct)
+            .impactSummary(String.format(
+                "NSS VIIT Pune achieved a %.1f%% increase in blood donation participation by engaging %d users through targeted awareness campaigns and event polling.",
+                increasePct, totalUsers))
             .build();
     }
 }

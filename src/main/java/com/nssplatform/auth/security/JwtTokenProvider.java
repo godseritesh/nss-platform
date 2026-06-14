@@ -1,8 +1,9 @@
 package com.nssplatform.auth.security;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SecurityException;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,10 +22,14 @@ public class JwtTokenProvider {
     private long jwtExpirationMs;
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(
-            java.util.Base64.getEncoder().encodeToString(jwtSecret.getBytes())
-        );
-        return Keys.hmacShaKeyFor(keyBytes);
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
+    }
+
+    @PostConstruct
+    public void init() {
+        if (jwtSecret.length() < 32) {
+            throw new SecurityException("JWT secret must be at least 32 characters long");
+        }
     }
 
     public String generateToken(String email, String role) {

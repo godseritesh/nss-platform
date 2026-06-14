@@ -37,17 +37,19 @@ export default function EventsPage() {
   const [category, setCategory]   = useState('ALL');
 
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
     eventsApi.list(page, 9)
       .then(({ data }) => {
+        if (cancelled) return;
         const items = category === 'ALL'
           ? data.content
           : data.content.filter(e => e.category === category);
         setEvents(items);
         setTotal(data.totalPages);
       })
-      .catch(() => setError('Failed to load events.'))
-      .finally(() => setLoading(false));
+      .catch(() => { if (!cancelled) setError('Failed to load events.'); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [page, category]);
 
   return (

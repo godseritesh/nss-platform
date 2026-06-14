@@ -1,4 +1,11 @@
 spring:
+  datasource:
+    url: ${JDBC_DATABASE_URL:jdbc:postgresql://localhost:5432/nssdb}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    hikari:
+      connection-timeout: 10000
+      maximum-pool-size: 10
   jpa:
     show-sql: false
     properties:
@@ -10,3 +17,9 @@ logging:
     com.nssplatform: INFO
     org.springframework.security: WARN
     org.hibernate: WARN
+
+server:
+  servlet:
+    session:
+      cookie:
+        secure: true

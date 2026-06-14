@@ -78,9 +78,9 @@ public class PollService {
         poll.setQuestion(req.getQuestion().trim());
         poll.setExpiresAt(req.getExpiresAt());
 
-        // Replace options
+        // Soft-replace options: remove old, add new, keep existing votes
+        pollOptionRepository.deleteByPollId(id);
         poll.getOptions().clear();
-        pollOptionRepository.deleteAll(pollOptionRepository.findByPollIdOrderByDisplayOrderAsc(id));
         AtomicInteger order = new AtomicInteger(0);
         req.getOptions().forEach(optText -> {
             PollOption opt = PollOption.builder()

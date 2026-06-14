@@ -37,7 +37,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
         @Override
         public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
             String path = request.getRequestURI();
-            if (!path.startsWith("/api/") && !path.startsWith("/assets/") && !path.contains(".")) {
+            boolean isStaticFile = path.matches(".*\\.[a-zA-Z]{2,5}$");
+            if (!path.startsWith("/api/") && !path.startsWith("/assets/") && !isStaticFile) {
                 request.getRequestDispatcher("/index.html").forward(request, response);
                 return false;
             }

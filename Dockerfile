@@ -19,11 +19,8 @@ RUN cd frontend && npm run build
 
 # 3. Copy Java source and build JAR
 COPY src ./src
-# Ensure static dir exists and copy built assets into the JAR resources
-RUN mkdir -p src/main/resources/static && \
-    cp -r frontend/dist/* src/main/resources/static/
     
-RUN mvn clean package -DskipTests
+RUN mvn clean package -DskipTests -Dskip.frontend=true
 
 # ---------- RUN STAGE ----------
 FROM eclipse-temurin:17-jre-alpine

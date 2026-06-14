@@ -3,15 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import { bloodApi } from '../api';
-import { BLOOD_GROUPS, URGENCY_META, formatDate, truncate } from '../utils/constants';
+import { BLOOD_GROUPS, URGENCY_META, truncate } from '../utils/constants';
 
-// Fix default Leaflet marker icons (webpack/vite asset issue)
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl:       'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  iconRetinaUrl: markerIcon2x,
+  iconUrl:       markerIcon,
+  shadowUrl:     markerShadow,
 });
 
 const URGENCY_ICONS = {
@@ -20,16 +22,9 @@ const URGENCY_ICONS = {
   STANDARD: L.divIcon({ className: '', html: `<div style="width:10px;height:10px;border-radius:50%;background:#3b82f6;border:2px solid #fff"></div>`, iconSize: [10,10], iconAnchor: [5,5] }),
 };
 
-function urgencyClass(urgency) {
-  if (urgency === 'CRITICAL') return 'critical';
-  if (urgency === 'URGENT') return 'urgent';
-  return 'standard';
-}
-
 function RequestCard({ r }) {
   const nav = useNavigate();
   const u = URGENCY_META[r.urgency] ?? URGENCY_META.STANDARD;
-  const dc = urgencyClass(r.urgency);
   return (
     <div className="card req-card card-clickable" onClick={() => nav(`/blood-requests/${r.id}`)}>
       <div className={`urgency-bar ${r.urgency}`} />
@@ -64,23 +59,27 @@ export default function BloodRequestsPage() {
   const [requests, setRequests]   = useState([]);
   const [mapData, setMapData]     = useState([]);
   const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState(null);
   const [page, setPage]           = useState(0);
   const [totalPages, setTotal]    = useState(1);
   const [bgFilter, setBgFilter]   = useState('');
-  const [view, setView]           = useState('list'); // 'list' | 'map'
+  const [view, setView]           = useState('list');
 
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
     const params = { page, size: 12 };
     if (bgFilter) params.bloodGroup = bgFilter;
     bloodApi.list(params)
-      .then(({ data }) => { setRequests(data.content); setTotal(data.totalPages); })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+      .then(({ data }) => { if (!cancelled) { setRequests(data.content); setTotal(data.totalPages); } })
+      .catch(() => { if (!cancelled) setError('Failed to load blood requests.'); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [page, bgFilter]);
 
   useEffect(() => {
-    bloodApi.forMap().then(({ data }) => setMapData(data)).catch(() => {});
+    let cancelled = false;
+    bloodApi.forMap().then(({ data }) => { if (!cancelled) setMapData(data); }).catch(() => {});
+    return () => { cancelled = true; };
   }, []);
 
   const critical = requests.filter(r => r.urgency === 'CRITICAL');
@@ -145,10 +144,12 @@ export default function BloodRequestsPage() {
           </div>
         )}
 
-        {loading && <div className="spinner" />}
+        {error && <div className="alert alert-error" style={{ marginBottom: '1.5rem' }}>{error}</div>}
+
+        {loading && <div className="spinner" role="status" aria-label="Loading blood requests" />}
 
         {/* Critical banner */}
-        {!loading && critical.length > 0 && (
+        {!loading && !error && critical.length > 0 && (
           <div style={{ marginBottom: '2rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#f87171', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
@@ -162,13 +163,13 @@ export default function BloodRequestsPage() {
         )}
 
         {/* Other requests */}
-        {!loading && others.length > 0 && (
+        {!loading && !error && others.length > 0 && (
           <div className="grid-auto">
             {others.map(r => <RequestCard key={r.id} r={r} />)}
           </div>
         )}
 
-        {!loading && requests.length === 0 && (
+        {!loading && !error && requests.length === 0 && (
           <div className="empty"><div className="empty-icon">🩸</div><p>No open blood requests match your filter.</p></div>
         )}
 

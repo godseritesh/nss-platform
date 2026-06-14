@@ -3,7 +3,6 @@ package com.nssplatform.blood.dto;
 import com.nssplatform.blood.entity.BloodRequest;
 import jakarta.validation.constraints.*;
 import lombok.Data;
-import java.time.LocalDate;
 
 @Data
 public class BloodRequestForm {
@@ -30,7 +29,12 @@ public class BloodRequestForm {
     @Size(max = 100)
     private String district;
 
+    @DecimalMin(value = "-90", message = "Latitude must be between -90 and 90")
+    @DecimalMax(value = "90", message = "Latitude must be between -90 and 90")
     private Double latitude;
+
+    @DecimalMin(value = "-180", message = "Longitude must be between -180 and 180")
+    @DecimalMax(value = "180", message = "Longitude must be between -180 and 180")
     private Double longitude;
 
     @NotBlank(message = "Contact name is required")

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { authApi } from '../api';
 
 const AuthContext = createContext(null);
@@ -7,18 +7,14 @@ export function AuthProvider({ children }) {
   const [user, setUser]       = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchMe = useCallback(async () => {
-    try {
-      const { data } = await authApi.me();
-      setUser(data);
-    } catch {
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    let cancelled = false;
+    authApi.me()
+      .then(({ data }) => { if (!cancelled) setUser(data); })
+      .catch(() => { if (!cancelled) setUser(null); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, []);
-
-  useEffect(() => { fetchMe(); }, [fetchMe]);
 
   const login = async (credentials) => {
     const { data } = await authApi.login(credentials);
@@ -46,6 +42,7 @@ export function AuthProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');

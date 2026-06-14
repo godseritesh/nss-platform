@@ -3,14 +3,17 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import { bloodApi } from '../api';
-import { URGENCY_META, formatDate, formatDatetime } from '../utils/constants';
+import { URGENCY_META, formatDatetime } from '../utils/constants';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl:       'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  iconRetinaUrl: markerIcon2x,
+  iconUrl:       markerIcon,
+  shadowUrl:     markerShadow,
 });
 
 function InterestForm({ requestId, onSuccess }) {
@@ -83,7 +86,6 @@ export default function BloodRequestDetailPage() {
 
   const u = URGENCY_META[req.urgency] ?? URGENCY_META.STANDARD;
   const hasMap = req.latitude && req.longitude;
-  const daysClass = req.urgency === 'CRITICAL' ? 'critical' : req.urgency === 'URGENT' ? 'urgent' : 'standard';
 
   return (
     <div className="page-wrap">

@@ -4,9 +4,7 @@ import com.nssplatform.blood.entity.BloodRequest;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 @Data @Builder
 public class BloodRequestResponse {

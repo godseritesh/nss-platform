@@ -62,9 +62,7 @@ public class SecurityConfig {
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
             // CSRF: disabled for stateless JWT API
-            .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/api/**")
-            );
+            .csrf(csrf -> csrf.disable());
 
         return http.build();
     }

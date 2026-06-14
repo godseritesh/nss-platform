@@ -32,26 +32,26 @@ function EventForm({ onCreated }) {
       {msg && <div className={`alert alert-${msg.type}`}>{msg.text}</div>}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label className="form-label">Title *</label>
-          <input name="title" className="form-control" value={form.title} onChange={handleChange} required placeholder="Event title" />
+          <label className="form-label" htmlFor="ev-title">Title *</label>
+          <input id="ev-title" name="title" className="form-control" value={form.title} onChange={handleChange} required placeholder="Event title" />
         </div>
         <div className="form-group">
-          <label className="form-label">Description</label>
-          <textarea name="description" className="form-control" value={form.description} onChange={handleChange} rows={3} placeholder="Event details…" />
+          <label className="form-label" htmlFor="ev-desc">Description</label>
+          <textarea id="ev-desc" name="description" className="form-control" value={form.description} onChange={handleChange} rows={3} placeholder="Event details…" />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           <div className="form-group">
-            <label className="form-label">Date</label>
-            <input name="eventDate" type="date" className="form-control" value={form.eventDate} onChange={handleChange} />
+            <label className="form-label" htmlFor="ev-date">Date</label>
+            <input id="ev-date" name="eventDate" type="date" className="form-control" value={form.eventDate} onChange={handleChange} />
           </div>
           <div className="form-group">
-            <label className="form-label">Location</label>
-            <input name="location" className="form-control" value={form.location} onChange={handleChange} placeholder="VIIT Campus…" />
+            <label className="form-label" htmlFor="ev-loc">Location</label>
+            <input id="ev-loc" name="location" className="form-control" value={form.location} onChange={handleChange} placeholder="VIIT Campus…" />
           </div>
         </div>
         <div className="form-group">
-          <label className="form-label">Category *</label>
-          <select name="category" className="form-control" value={form.category} onChange={handleChange}>
+          <label className="form-label" htmlFor="ev-cat">Category *</label>
+          <select id="ev-cat" name="category" className="form-control" value={form.category} onChange={handleChange}>
             {CATEGORIES.map(c => <option key={c} value={c}>{CATEGORY_META[c].icon} {CATEGORY_META[c].label}</option>)}
           </select>
         </div>
@@ -98,18 +98,18 @@ function PollForm({ events }) {
       {msg && <div className={`alert alert-${msg.type}`}>{msg.text}</div>}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label className="form-label">Event *</label>
-          <select className="form-control" value={eventId} onChange={e => setEventId(e.target.value)} required>
+          <label className="form-label" htmlFor="poll-event">Event *</label>
+          <select id="poll-event" className="form-control" value={eventId} onChange={e => setEventId(e.target.value)} required>
             <option value="">— Select event —</option>
             {events.map(ev => <option key={ev.id} value={ev.id}>{ev.title}</option>)}
           </select>
         </div>
         <div className="form-group">
-          <label className="form-label">Question *</label>
-          <input className="form-control" value={question} onChange={e => setQuestion(e.target.value)} required placeholder="Poll question…" />
+          <label className="form-label" htmlFor="poll-q">Question *</label>
+          <input id="poll-q" className="form-control" value={question} onChange={e => setQuestion(e.target.value)} required placeholder="Poll question…" />
         </div>
         <div className="form-group">
-          <label className="form-label">Options (min 2)</label>
+          <label className="form-label" htmlFor="poll-opt-0">Options (min 2)</label>
           {options.map((opt, i) => (
             <div key={i} className="flex gap-1" style={{ marginBottom: '0.5rem' }}>
               <input className="form-control" value={opt} onChange={e => updateOption(i, e.target.value)} placeholder={`Option ${i + 1}`} />
@@ -121,8 +121,8 @@ function PollForm({ events }) {
           <button type="button" className="btn btn-secondary btn-sm mt-1" onClick={addOption}>+ Add Option</button>
         </div>
         <div className="form-group">
-          <label className="form-label">Expires At (optional)</label>
-          <input type="datetime-local" className="form-control" value={expiresAt} onChange={e => setExpiresAt(e.target.value)} />
+          <label className="form-label" htmlFor="poll-exp">Expires At (optional)</label>
+          <input id="poll-exp" type="datetime-local" className="form-control" value={expiresAt} onChange={e => setExpiresAt(e.target.value)} />
         </div>
         <button type="submit" className="btn btn-primary" disabled={loading}>
           {loading ? 'Creating…' : '✅ Create Poll'}
@@ -144,7 +144,7 @@ export default function AdminDashboard() {
     if (!isAdmin) { navigate('/'); return; }
     analyticsApi.overview().then(({ data }) => setStats(data));
     eventsApi.list(0, 50).then(({ data }) => setEvents(data.content));
-  }, [isAdmin, refresh]);
+  }, [isAdmin, navigate, refresh]);
 
   if (!isAdmin) return null;
 
