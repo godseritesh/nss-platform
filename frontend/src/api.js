@@ -7,10 +7,16 @@ const api = axios.create({
 });
 
 export const authApi = {
-  register: (data) => api.post('/auth/register', data),
-  login:    (data) => api.post('/auth/login',    data),
-  logout:   ()     => api.post('/auth/logout'),
-  me:       ()     => api.get('/auth/me'),
+  register:        (data) => api.post('/auth/register', data),
+  login:           (data) => api.post('/auth/login',    data),
+  logout:          ()     => api.post('/auth/logout'),
+  me:              ()     => api.get('/auth/me'),
+  forgotPassword:  (data) => api.post('/auth/forgot-password', data),
+  resetPassword:   (data) => api.post('/auth/reset-password', data),
+};
+
+export const profileApi = {
+  update: (data) => api.put('/profile', data),
 };
 
 export const eventsApi = {
@@ -45,6 +51,11 @@ export const bloodApi = {
   submit:           (data)       => api.post('/blood-requests', data),
   registerInterest: (id, data)   => api.post(`/blood-requests/${id}/interest`, data),
   fulfill:          (id)         => api.patch(`/blood-requests/${id}/fulfill`),
+};
+
+export const adminApi = {
+  listUsers: (params) => api.get('/admin/users', { params }),
+  deleteUser: (id)    => api.delete(`/admin/users/${id}`),
 };
 
 export default api;

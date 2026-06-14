@@ -23,6 +23,17 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
     connect-retries: 5
+  mail:
+    host: ${SMTP_HOST:localhost}
+    port: ${SMTP_PORT:1025}
+    username: ${SMTP_USER:}
+    password: ${SMTP_PASS:}
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: ${SMTP_TLS:false}
+          auth: ${SMTP_AUTH:false}
 
 server:
   port: ${APP_PORT:8080}
@@ -35,6 +46,8 @@ app:
     expiration-ms: 86400000
   cors:
     allowed-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost:8080}
+  email:
+    from: nss@viit.ac.in
 
 logging:
   level:

@@ -30,6 +30,24 @@ public class User {
     @Column(nullable = false, length = 20)
     private Role role;
 
+    @Column(name = "failed_attempts")
+    private int failedAttempts;
+
+    @Column(name = "lockout_time")
+    private LocalDateTime lockoutTime;
+
+    @Column(name = "verified")
+    private boolean verified;
+
+    @Column(name = "verification_token", length = 64)
+    private String verificationToken;
+
+    @Column(name = "reset_token", length = 64)
+    private String resetToken;
+
+    @Column(name = "reset_token_expiry")
+    private LocalDateTime resetTokenExpiry;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

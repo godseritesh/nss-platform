@@ -18,6 +18,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,27 +44,29 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .headers(headers -> headers
+                .xssProtection(xss -> xss.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK))
+                .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://*.tile.openstreetmap.org"))
+                .frameOptions(frame -> frame.sameOrigin())
+                .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
+                .contentTypeOptions(content -> {})
+                .cacheControl(cache -> {})
+            )
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // Public
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers(HttpMethod.GET,  "/api/events/**").permitAll()
                 .requestMatchers(HttpMethod.GET,  "/api/polls/**").permitAll()
                 .requestMatchers("/api/analytics/public/**").permitAll()
                 .requestMatchers(HttpMethod.GET,  "/api/blood-requests/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/blood-requests/*/interest").permitAll()
-                .requestMatchers("/actuator/health").permitAll()
-                // Static React assets
+                .requestMatchers("/actuator/health", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/", "/index.html", "/assets/**", "/favicon.ico", "/*.js", "/*.css").permitAll()
-                // Admin
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                // All other API calls need auth
                 .requestMatchers("/api/**").authenticated()
-                // Serve SPA for everything else
                 .anyRequest().permitAll()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-            // CSRF: disabled for stateless JWT API
             .csrf(csrf -> csrf.disable());
 
         return http.build();

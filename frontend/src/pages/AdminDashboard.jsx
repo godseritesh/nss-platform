@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { analyticsApi, eventsApi, pollsApi } from '../api';
 import { useAuth } from '../context/AuthContext';
 import { CATEGORY_META, formatDate } from '../utils/constants';
@@ -176,6 +176,11 @@ export default function AdminDashboard() {
             ))}
           </div>
         )}
+
+        {/* Admin Links */}
+        <div className="flex gap-1" style={{ marginBottom: '2rem' }}>
+          <Link to="/admin/users" className="btn btn-outline">👥 Manage Users</Link>
+        </div>
 
         {/* Blood Donation Impact Banner */}
         {stats && (

@@ -43,7 +43,7 @@ export default function Navbar() {
         <div className="nav-actions">
           {user ? (
             <>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-2)' }}>{user.name.split(' ')[0]}</span>
+              <NavLink to="/profile" className="nav-link" onClick={() => setOpen(false)} style={{ fontSize: '0.8rem', padding: '0.25rem 0.5rem' }}>{user.name.split(' ')[0]}</NavLink>
               <button className="btn btn-outline btn-sm" onClick={handleLogout}>Logout</button>
             </>
           ) : (

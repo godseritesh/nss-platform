@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { Component, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar               from './components/Navbar';
@@ -9,9 +9,16 @@ import EventDetailPage      from './pages/EventDetailPage';
 import LoginPage            from './pages/LoginPage';
 import RegisterPage         from './pages/RegisterPage';
 import AdminDashboard       from './pages/AdminDashboard';
-import BloodRequestsPage    from './pages/BloodRequestsPage';
-import BloodRequestDetailPage from './pages/BloodRequestDetailPage';
-import SubmitRequestPage    from './pages/SubmitRequestPage';
+import ProfilePage          from './pages/ProfilePage';
+
+const BloodRequestsPage     = lazy(() => import('./pages/BloodRequestsPage'));
+const BloodRequestDetailPage = lazy(() => import('./pages/BloodRequestDetailPage'));
+const SubmitRequestPage     = lazy(() => import('./pages/SubmitRequestPage'));
+const AdminUsersPage        = lazy(() => import('./pages/AdminUsersPage'));
+
+function Lazy({ children }) {
+  return <Suspense fallback={<div className="flex-center" style={{ height: '60vh' }}><div className="spinner" /></div>}>{children}</Suspense>;
+}
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -66,12 +73,14 @@ function AppRoutes() {
         <Route path="/"                         element={<HomePage />} />
         <Route path="/events"                   element={<EventsPage />} />
         <Route path="/events/:id"               element={<EventDetailPage />} />
-        <Route path="/blood-requests"           element={<BloodRequestsPage />} />
-        <Route path="/blood-requests/submit"    element={<SubmitRequestPage />} />
-        <Route path="/blood-requests/:id"       element={<BloodRequestDetailPage />} />
+        <Route path="/blood-requests"           element={<Lazy><BloodRequestsPage /></Lazy>} />
+        <Route path="/blood-requests/submit"    element={<Lazy><SubmitRequestPage /></Lazy>} />
+        <Route path="/blood-requests/:id"       element={<Lazy><BloodRequestDetailPage /></Lazy>} />
         <Route path="/login"    element={<GuestRoute><LoginPage /></GuestRoute>} />
         <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
+        <Route path="/profile"  element={<ProfilePage />} />
         <Route path="/admin"    element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+        <Route path="/admin/users" element={<AdminRoute><Lazy><AdminUsersPage /></Lazy></AdminRoute>} />
         <Route path="*"         element={<NotFoundPage />} />
       </Routes>
       <Footer />
