@@ -144,12 +144,6 @@
                 </configuration>
             </plugin>
 
-            <!--
-                Frontend build: node/npm managed by plugin.
-                Runs during prepare-package so `mvn compile` stays fast.
-                Skip with: mvn package -Dskip.frontend=true
-            -->
-            
             <!-- Copy built React assets into Spring Boot's static resources -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -157,7 +151,8 @@
                 <executions>
                     <execution>
                         <id>copy-frontend-build</id>
-                        <phase>package</phase>
+                        <!-- Must run before jar:jar and spring-boot:repackage -->
+                        <phase>prepare-package</phase>
                         <goals><goal>copy-resources</goal></goals>
                         <configuration>
                             <outputDirectory>${project.build.outputDirectory}/static</outputDirectory>
