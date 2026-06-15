@@ -23,7 +23,7 @@ jobs:
         run: mvn clean verify -B
 
       - name: Run Trivy vulnerability scanner (fs)
-        uses: aquasecurity/trivy-action@v0.30.0
+        uses: aquasecurity/trivy-action@v0.29.0
         with:
           scan-type: fs
           scan-ref: .
@@ -45,7 +45,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run Trivy on Docker image
-        uses: aquasecurity/trivy-action@v0.30.0
+        uses: aquasecurity/trivy-action@v0.29.0
         with:
           scan-type: image
           image-ref: nss-platform:latest
