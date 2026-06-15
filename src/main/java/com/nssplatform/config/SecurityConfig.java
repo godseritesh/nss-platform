@@ -60,7 +60,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/analytics/public/**").permitAll()
                 .requestMatchers(HttpMethod.GET,  "/api/blood-requests/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/blood-requests/*/interest").permitAll()
-                .requestMatchers("/actuator/health", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/actuator/health", "/ping", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/", "/index.html", "/assets/**", "/favicon.ico", "/*.js", "/*.css").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/**").authenticated()
