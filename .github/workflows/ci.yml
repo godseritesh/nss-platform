@@ -48,6 +48,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Build Docker image
+        run: docker build -t nss-platform:latest .
+
       - name: Run Trivy on Docker image
         uses: aquasecurity/trivy-action@v0.36.0
         with:
