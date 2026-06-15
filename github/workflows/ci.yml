@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Check for secure JWT secret
+      run: |
+        if [ -z "$JWT_SECRET" ]; then
+          echo "JWT_SECRET environment variable is not set."
+          exit 1
+        else
+          echo "JWT_SECRET environment variable is set."
+        fi
+
+    - name: Run tests
+      run: npm test

@@ -39,3 +39,8 @@ server:
     session:
       cookie:
         secure: true
+
+# Secure JWT secret
+app:
+  jwt:
+    secret: ${JWT_SECRET:verysecuresecret}

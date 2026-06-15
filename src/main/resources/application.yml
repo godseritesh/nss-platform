@@ -42,7 +42,7 @@ server:
 
 app:
   jwt:
-    secret: ${JWT_SECRET:NSS-VIIT-PUNE-DEV-SECRET-CHANGE-IN-PROD-2024}
+    secret: ${JWT_SECRET:$(cat /etc/nss-platform/jwt-secret)}
     expiration-ms: 86400000
   cors:
     allowed-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost:8080}
