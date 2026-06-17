@@ -101,4 +101,36 @@ class AuthIntegrationTest {
                 .content(objectMapper.writeValueAsString(bad)))
             .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void environmentVariableIsNotExposed() throws Exception {
+        mockMvc.perform(get("/api/env/variables"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void sensitiveEnvironmentVariablesAreNotLeakedInErrorMessages() throws Exception {
+        RegisterRequest bad = new RegisterRequest();
+        bad.setName("");
+        bad.setEmail("not-an-email");
+        bad.setPassword("short");
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(bad)))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("ENV_VAR_VALUE"))));
+    }
+
+    @Test
+    void sensitiveInformationIsNotLogged() throws Exception {
+        LoginRequest login = new LoginRequest();
+        login.setEmail("inttest@nss.test");
+        login.setPassword("wrong");
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(login)))
+            .andExpect(status().isUnauthorized());
+    }
 }

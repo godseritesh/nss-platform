@@ -13,7 +13,7 @@ spring:
 
 app:
   jwt:
-    secret: NSS-VIIT-TEST-SECRET-LONG-ENOUGH-FOR-TESTING-ONLY
+    secret: ${JWT_SECRET:NSS-VIIT-TEST-SECRET-LONG-ENOUGH-FOR-TESTING-ONLY}
     expiration-ms: 3600000
   cors:
-    allowed-origins: http://localhost:5173
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}

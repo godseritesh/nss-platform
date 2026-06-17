@@ -1,3 +1,27 @@
+# src/main/resources/bootstrap.yml
+env:
+  - name: SMTP_HOST
+    value: 'localhost'
+  - name: SMTP_PORT
+    value: '25'
+  - name: SMTP_USER
+    value: 'smtp_user'
+  - name: SMTP_PASS
+    value: 'smtp_password'
+    secure: true
+  - name: SMTP_TLS
+    value: 'true'
+  - name: SMTP_AUTH
+    value: 'true'
+  - name: JWT_SECRET
+    value: 'your-jwt-secret'
+    sensitive: true
+  - name: APP_PORT
+    value: '8080'
+  - name: CORS_ORIGINS
+    value: 'http://localhost:5173,http://localhost:8080'
+
+# src/main/resources/application.yml
 spring:
   application:
     name: nss-platform
@@ -24,28 +48,28 @@ spring:
     baseline-on-migrate: true
     connect-retries: 5
   mail:
-    host: ${SMTP_HOST:localhost}
-    port: ${SMTP_PORT:1025}
-    username: ${SMTP_USER:}
-    password: ${SMTP_PASS:}
+    host: ${SMTP_HOST}
+    port: ${SMTP_PORT}
+    username: ${SMTP_USER}
+    password: ${SMTP_PASS}
     properties:
       mail:
         smtp:
           starttls:
-            enable: ${SMTP_TLS:false}
-          auth: ${SMTP_AUTH:false}
+            enable: ${SMTP_TLS}
+          auth: ${SMTP_AUTH}
 
 server:
-  port: ${APP_PORT:8080}
+  port: ${APP_PORT}
   servlet:
     context-path: /
 
 app:
   jwt:
-    secret: ${JWT_SECRET:$(cat /etc/nss-platform/jwt-secret)}
+    secret: ${JWT_SECRET}
     expiration-ms: 86400000
   cors:
-    allowed-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost:8080}
+    allowed-origins: ${CORS_ORIGINS}
   email:
     from: nss@viit.ac.in
 
