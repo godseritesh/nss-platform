@@ -33,8 +33,13 @@ public class BloodRequestController {
         if (bloodGroup != null) {
             try {
                 BloodRequest.BloodGroup bg = BloodRequest.BloodGroup.valueOf(bloodGroup);
+                if (bg == null) {
+                    return ResponseEntity.badRequest().build();
+                }
                 return ResponseEntity.ok(service.listByBloodGroup(bg, pageable));
-            } catch (IllegalArgumentException ignored) {}
+            } catch (IllegalArgumentException ignored) {
+                return ResponseEntity.badRequest().build();
+            }
         }
         return ResponseEntity.ok(service.listOpen(pageable));
     }
@@ -48,6 +53,9 @@ public class BloodRequestController {
     /** Public: single request detail */
     @GetMapping("/{id}")
     public ResponseEntity<BloodRequestResponse> getOne(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.ok(service.getOne(id));
     }
 
@@ -56,6 +64,9 @@ public class BloodRequestController {
     public ResponseEntity<BloodRequestResponse> submit(
             @Valid @RequestBody BloodRequestForm form,
             @AuthenticationPrincipal String email) {
+        if (email == null || email.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.status(201).body(service.submit(form, email));
     }
 
@@ -63,6 +74,9 @@ public class BloodRequestController {
     @PostMapping("/{id}/interest")
     public ResponseEntity<Void> interest(@PathVariable Long id,
                                           @Valid @RequestBody DonorInterestForm form) {
+        if (id == null || id <= 0) {
+            return ResponseEntity.badRequest().build();
+        }
         service.registerInterest(id, form);
         return ResponseEntity.status(201).build();
     }
@@ -71,6 +85,9 @@ public class BloodRequestController {
     @PatchMapping("/{id}/fulfill")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> fulfill(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            return ResponseEntity.badRequest().build();
+        }
         service.fulfill(id);
         return ResponseEntity.noContent().build();
     }

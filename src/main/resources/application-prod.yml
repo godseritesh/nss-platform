@@ -10,23 +10,39 @@ spring:
           starttls:
             enable: true
           auth: true
+
   datasource:
-    url: jdbc:postgresql://ep-autumn-hill-ao8yoixr-pooler.c-2.ap-southeast-1.aws.neon.tech:5432/neondb?sslmode=require
-    username: neondb_owner
-    password: npg_uN7xk5JDMtai
+    url: ${DB_URL:jdbc:postgresql://ep-autumn-hill-ao8yoixr-pooler.c-2.ap-southeast-1.aws.neon.tech:5432/neondb?sslmode=require}
+    username: ${DB_USERNAME:neondb_owner}
+    password: ${DB_PASSWORD:npg_uN7xk5JDMtai}
     hikari:
       connection-timeout: 15000
       maximum-pool-size: 5
       minimum-idle: 2
+
   jpa:
-    show-sql: false
+    show-sql: ${SHOW_SQL:false}
     properties:
       hibernate:
-        format_sql: false
+        format_sql: ${FORMAT_SQL:false}
+
+  secrets:
+    smtp-host: ${SMTP_HOST:smtp-relay.brevo.com}
+    smtp-port: ${SMTP_PORT:587}
+    smtp-username: ${SMTP_USER:}
+    smtp-password: ${SMTP_PASS:}
+    db-url: ${DB_URL:jdbc:postgresql://ep-autumn-hill-ao8yoixr-pooler.c-2.ap-southeast-1.aws.neon.tech:5432/neondb?sslmode=require}
+    db-username: ${DB_USERNAME:neondb_owner}
+    db-password: ${DB_PASSWORD:npg_uN7xk5JDMtai}
+    db-show-sql: ${SHOW_SQL:false}
+    db-format-sql: ${FORMAT_SQL:false}
+    jwt-secret: ${JWT_SECRET:verylongandsecuresecretgeneratedbysecuremethod}
 
 app:
   email:
-    from: nss@viit.ac.in    # must be verified as a sender in Brevo
+    from: nss@viit.ac.in
+  jwt:
+    secret: ${JWT_SECRET:verylongandsecuresecretgeneratedbysecuremethod}
 
 logging:
   level:
