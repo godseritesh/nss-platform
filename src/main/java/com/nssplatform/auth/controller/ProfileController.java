@@ -2,6 +2,7 @@ package com.nssplatform.auth.controller;
 
 import com.nssplatform.auth.dto.AuthResponse;
 import com.nssplatform.auth.dto.UpdateProfileRequest;
+import com.nssplatform.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
