@@ -133,4 +133,69 @@ class AuthIntegrationTest {
                 .content(objectMapper.writeValueAsString(login)))
             .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    void testValidationForNullNameInRegisterRequest() throws Exception {
+        RegisterRequest reg = new RegisterRequest();
+        reg.setName(null);
+        reg.setEmail("inttest@nss.test");
+        reg.setPassword("Password123!");
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(reg)))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testValidationForEmptyEmailInRegisterRequest() throws Exception {
+        RegisterRequest reg = new RegisterRequest();
+        reg.setName("Integration Tester");
+        reg.setEmail("");
+        reg.setPassword("Password123!");
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(reg)))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testValidationForInvalidEmailInRegisterRequest() throws Exception {
+        RegisterRequest reg = new RegisterRequest();
+        reg.setName("Integration Tester");
+        reg.setEmail("invalid-email");
+        reg.setPassword("Password123!");
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(reg)))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testValidationForNullPasswordInRegisterRequest() throws Exception {
+        RegisterRequest reg = new RegisterRequest();
+        reg.setName("Integration Tester");
+        reg.setEmail("inttest@nss.test");
+        reg.setPassword(null);
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(reg)))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testValidationForShortPasswordInRegisterRequest() throws Exception {
+        RegisterRequest reg = new RegisterRequest();
+        reg.setName("Integration Tester");
+        reg.setEmail("inttest@nss.test");
+        reg.setPassword("short");
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(reg)))
+            .andExpect(status().isBadRequest());
+    }
 }
