@@ -2,7 +2,6 @@ package com.nssplatform.polls.controller;
 
 import com.nssplatform.polls.dto.PollRequest;
 import com.nssplatform.polls.dto.PollResponse;
-import com.nssplatform.polls.exceptions.InvalidRequestException;
 import com.nssplatform.polls.service.PollService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,7 @@ public class PollController {
     @GetMapping("/api/events/{eventId}/polls")
     public ResponseEntity<List<PollResponse>> byEvent(@PathVariable Long eventId) {
         if (eventId == null || eventId <= 0) {
-            throw new InvalidRequestException("Event ID must be a positive number");
+            throw new IllegalArgumentException("Event ID must be a positive number");
         }
         return ResponseEntity.ok(pollService.getPollsByEvent(eventId));
     }
@@ -30,7 +29,7 @@ public class PollController {
     @GetMapping("/api/polls/{id}")
     public ResponseEntity<PollResponse> getById(@PathVariable Long id) {
         if (id == null || id <= 0) {
-            throw new InvalidRequestException("Poll ID must be a positive number");
+            throw new IllegalArgumentException("Poll ID must be a positive number");
         }
         return ResponseEntity.ok(pollService.getPoll(id));
     }
@@ -41,10 +40,10 @@ public class PollController {
                                                  @Valid @RequestBody PollRequest req,
                                                  @AuthenticationPrincipal String email) {
         if (eventId == null || eventId <= 0) {
-            throw newInvalidRequestException("Event ID must be a positive number");
+            throw newIllegalArgumentException("Event ID must be a positive number");
         }
         if (req == null || req.getQuestion() == null || req.getOptions() == null) {
-            throw newInvalidRequestException("Invalid poll request");
+            throw newIllegalArgumentException("Invalid poll request");
         }
         return ResponseEntity.status(201).body(pollService.createPoll(eventId, req, email));
     }
@@ -55,10 +54,10 @@ public class PollController {
                                                  @Valid @RequestBody PollRequest req,
                                                  @AuthenticationPrincipal String email) {
         if (id == null || id <= 0) {
-            throw newInvalidRequestException("Poll ID must be a positive number");
+            throw newIllegalArgumentException("Poll ID must be a positive number");
         }
         if (req == null || req.getQuestion() == null || req.getOptions() == null) {
-            throw newInvalidRequestException("Invalid poll request");
+            throw newIllegalArgumentException("Invalid poll request");
         }
         return ResponseEntity.ok(pollService.updatePoll(id, req, email));
     }
@@ -67,13 +66,13 @@ public class PollController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (id == null || id <= 0) {
-            throw newInvalidRequestException("Poll ID must be a positive number");
+            throw newIllegalArgumentException("Poll ID must be a positive number");
         }
         pollService.deletePoll(id);
         return ResponseEntity.noContent().build();
     }
 
-    private InvalidRequestException newInvalidRequestException(String message) {
-        return new InvalidRequestException(message);
+    private IllegalArgumentException newIllegalArgumentException(String message) {
+        return new IllegalArgumentException(message);
     }
 }
