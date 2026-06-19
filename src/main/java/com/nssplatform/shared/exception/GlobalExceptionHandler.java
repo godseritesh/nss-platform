@@ -62,6 +62,11 @@ public class GlobalExceptionHandler {
             "An unexpected error occurred", req.getRequestURI());
     }
 
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<ApiError> handleCustomException(CustomException ex, HttpServletRequest req) {
+        return error(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", ex.getMessage(), req.getRequestURI());
+    }
+
     private ResponseEntity<ApiError> error(HttpStatus status, String error, String message, String path) {
         return ResponseEntity.status(status).body(new ApiError(
             Instant.now().toString(), status.value(), error, message, path

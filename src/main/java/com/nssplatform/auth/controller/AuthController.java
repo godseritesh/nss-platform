@@ -29,65 +29,89 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request,
                                                   HttpServletResponse response) {
-        if (request.getUsername() == null || request.getUsername().isEmpty() || request.getUsername().length() > 50) {
-            return ResponseEntity.badRequest().build();
+        try {
+            if (request.getUsername() == null || request.getUsername().isEmpty() || request.getUsername().length() > 50) {
+                throw new RuntimeException("Invalid username");
+            }
+            if (request.getEmail() == null || request.getEmail().isEmpty() || !request.getEmail().matches("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$")) {
+                throw new RuntimeException("Invalid email");
+            }
+            if (request.getPassword() == null || request.getPassword().isEmpty() || request.getPassword().length() < 8) {
+                throw new RuntimeException("Invalid password");
+            }
+            if (request.getConfirmPassword() == null || request.getConfirmPassword().isEmpty() || !request.getConfirmPassword().equals(request.getPassword())) {
+                throw new RuntimeException("Passwords do not match");
+            }
+            return ResponseEntity.status(201).body(authService.register(request, response));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        if (request.getEmail() == null || request.getEmail().isEmpty() || !request.getEmail().matches("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$")) {
-            return ResponseEntity.badRequest().build();
-        }
-        if (request.getPassword() == null || request.getPassword().isEmpty() || request.getPassword().length() < 8) {
-            return ResponseEntity.badRequest().build();
-        }
-        if (request.getConfirmPassword() == null || request.getConfirmPassword().isEmpty() || !request.getConfirmPassword().equals(request.getPassword())) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.status(201).body(authService.register(request, response));
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request,
                                                HttpServletResponse response) {
-        if (request.getUsername() == null || request.getUsername().isEmpty() || request.getUsername().length() > 50) {
-            return ResponseEntity.badRequest().build();
+        try {
+            if (request.getUsername() == null || request.getUsername().isEmpty() || request.getUsername().length() > 50) {
+                throw new RuntimeException("Invalid username");
+            }
+            if (request.getPassword() == null || request.getPassword().isEmpty() || request.getPassword().length() < 8) {
+                throw new RuntimeException("Invalid password");
+            }
+            return ResponseEntity.ok(authService.login(request, response));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        if (request.getPassword() == null || request.getPassword().isEmpty() || request.getPassword().length() < 8) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok(authService.login(request, response));
     }
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response) {
-        authService.logout(response);
-        return ResponseEntity.noContent().build();
+        try {
+            authService.logout(response);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/me")
     public ResponseEntity<AuthResponse> me(@AuthenticationPrincipal String email) {
-        if (email == null || email.isEmpty() || !email.matches("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$")) {
-            return ResponseEntity.badRequest().build();
+        try {
+            if (email == null || email.isEmpty() || !email.matches("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$")) {
+                throw new RuntimeException("Invalid email");
+            }
+            return ResponseEntity.ok(authService.getCurrentUser(email));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return ResponseEntity.ok(authService.getCurrentUser(email));
     }
 
     @PostMapping("/forgot-password")
     public ResponseEntity<Map<String, String>> forgotPassword(@Valid @RequestBody PasswordResetRequest request) {
-        if (request.getEmail() == null || request.getEmail().isEmpty() || !request.getEmail().matches("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$")) {
-            return ResponseEntity.badRequest().build();
+        try {
+            if (request.getEmail() == null || request.getEmail().isEmpty() || !request.getEmail().matches("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$")) {
+                throw new RuntimeException("Invalid email");
+            }
+            authService.requestPasswordReset(request);
+            return ResponseEntity.ok(Map.of("message", "If the email exists, a reset link has been sent."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        authService.requestPasswordReset(request);
-        return ResponseEntity.ok(Map.of("message", "If the email exists, a reset link has been sent."));
     }
 
     @PostMapping("/reset-password")
     public ResponseEntity<Map<String, String>> resetPassword(@Valid @RequestBody PasswordResetConfirm request) {
-        if (request.getPassword() == null || request.getPassword().isEmpty() || request.getPassword().length() < 8) {
-            return ResponseEntity.badRequest().build();
+        try {
+            if (request.getPassword() == null || request.getPassword().isEmpty() || request.getPassword().length() < 8) {
+                throw new RuntimeException("Invalid password");
+            }
+            if (request.getConfirmPassword() == null || request.getConfirmPassword().isEmpty() || !request.getConfirmPassword().equals(request.getPassword())) {
+                throw new RuntimeException("Passwords do not match");
+            }
+            authService.confirmPasswordReset(request);
+            return ResponseEntity.ok(Map.of("message", "Password has been reset successfully."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        if (request.getConfirmPassword() == null || request.getConfirmPassword().isEmpty() || !request.getConfirmPassword().equals(request.getPassword())) {
-            return ResponseEntity.badRequest().build();
-        }
-        authService.confirmPasswordReset(request);
-        return ResponseEntity.ok(Map.of("message", "Password has been reset successfully."));
     }
 }
